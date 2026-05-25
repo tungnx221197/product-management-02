@@ -64,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
   @Override
   public Response getPrductById(Long id) {
     Product product = getProductById(id);
-    Category category = getCategoryById(product.getProductId());
+    Category category = product.getCategory();
 
     ProductDto.CategoryInfo categoryInfo = new ProductDto.CategoryInfo();
     categoryInfo.setCategoryId(category.getCategoryId());
@@ -91,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     Product savedProduct = productRepository.save(product);
-    Category category = getCategoryById(savedProduct.getCategory().getCategoryId());
+    Category category = savedProduct.getCategory();
 
     ProductDto.CategoryInfo categoryInfo = new ProductDto.CategoryInfo();
     categoryInfo.setCategoryId(category.getCategoryId());
@@ -112,10 +112,4 @@ public class ProductServiceImpl implements ProductService {
         .orElseThrow(() -> new ResourceNotFoundException("Sản phẩm không tồn tại"));
   }
 
-  private Category getCategoryById(long id) throws ResourceNotFoundException {
-    return categoryRepository.findById(id)
-        .orElseThrow(
-            () -> new ResourceNotFoundException("Danh mục không tồn tại!")
-        );
-  }
 }

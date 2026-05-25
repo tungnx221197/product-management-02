@@ -13,5 +13,6 @@ public interface UserMapper {
   @Mapping(target = "adminDescription", ignore = true)
   UserResponseDto toUserResponseDto(User user);
 
+  @Mapping(target = "password", ignore = true)
   User toUser(CreateUserRequestDto createUserRequestDto);
 }

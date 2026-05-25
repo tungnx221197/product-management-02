@@ -43,11 +43,11 @@ public class UserServiceImpl implements UserService {
 
     String encodedPassword = passwordEncoder.encode(user.getPassword());
     user.setPassword(encodedPassword);
-    System.out.println(user.getPassword());
-    System.out.println(user.getUsername());
 
     User userSaved = userRepository.save(userMapper.toUser(user));
+
     UserResponseDto userResponseDto = userMapper.toUserResponseDto(userSaved);
+
     String activeDescription = getActiveDescription(0);
     String adminDescription = getAdminDescription(0);
     userResponseDto.setActiveDescription(activeDescription);

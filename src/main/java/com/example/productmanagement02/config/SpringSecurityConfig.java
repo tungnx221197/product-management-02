@@ -1,5 +1,6 @@
 package com.example.productmanagement02.config;
 
+import com.example.productmanagement02.exception.CustomAccessDeniedHandler;
 import com.example.productmanagement02.jwt.JwtAuthenticationEntryPoint;
 import com.example.productmanagement02.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -25,6 +27,7 @@ public class SpringSecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
   @Bean
   public static PasswordEncoder passwordEncoder() {
@@ -43,6 +46,8 @@ public class SpringSecurityConfig {
     http.sessionManagement(
         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     http.authorizeHttpRequests(authorizeRequests -> {
+      authorizeRequests.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+          .permitAll();
       authorizeRequests.requestMatchers(HttpMethod.POST, "/api/users/register").permitAll();
       authorizeRequests.requestMatchers(HttpMethod.POST, "/api/users/login").permitAll();
       authorizeRequests.requestMatchers(HttpMethod.PATCH, "/api/users/**").hasRole("ADMIN");
@@ -50,7 +55,8 @@ public class SpringSecurityConfig {
       authorizeRequests.anyRequest().authenticated();
     });
 
-    http.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
+    http.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+        .accessDeniedHandler(customAccessDeniedHandler));
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     http.httpBasic(Customizer.withDefaults());
     return http.build();
